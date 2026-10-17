@@ -1,4 +1,4 @@
-group = "app.zdrgon"
+group = "app.private"
 
 patches {
     about {
