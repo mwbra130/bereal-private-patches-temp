@@ -2,19 +2,8 @@ package app.private.patches
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
-import app.morphe.patcher.patch.ApkFileType
-import app.morphe.patcher.patch.AppTarget
-import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
-
-private val COMPATIBILITY_LOCATION_PRIVATE = Compatibility(
-    name = "BeReal",
-    packageName = "com.bereal.ft",
-    apkFileType = ApkFileType.XAPK,
-    targets = listOf(
-        AppTarget(version = "3.97.1"),
-    ),
-)
+import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 
 /**
  * BeReal's Location entity constructor.
@@ -45,18 +34,16 @@ object LocationEntityFingerprint : Fingerprint(
  *
  * PRIVATE PATCH — not for public distribution.
  */
+@Suppress("unused")
 val locationOverridePatch = bytecodePatch(
     name = "Change location",
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
         "for BeReal's GPS location. Only active when the file exists.",
 ) {
-    compatibleWith(COMPATIBILITY_LOCATION_PRIVATE)
+    compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
         LocationEntityFingerprint.method.apply {
-            // At the start of teb.<init>(D longitude, D latitude), check for
-            // the override file. Registers: p1/p2 = longitude (wide), p3/p4 = latitude (wide).
-            // We inject code that reads the file and overwrites p1-p4 if present.
             addInstructions(
                 0,
                 """
@@ -88,8 +75,6 @@ val locationOverridePatch = bytecodePatch(
                 aget-object v0, v0, v3
                 invoke-static {v0}, Ljava/lang/Double;->parseDouble(Ljava/lang/String;)D
                 move-result-wide v3
-                # v1/v2 = latitude, v3/v4 = longitude
-                # teb constructor takes (longitude, latitude) — p1/p2 = longitude, p3/p4 = latitude
                 move-wide p1, v3
                 move-wide p3, v1
                 :no_override
