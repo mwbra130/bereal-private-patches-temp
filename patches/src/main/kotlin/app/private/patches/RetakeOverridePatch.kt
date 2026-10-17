@@ -2,40 +2,21 @@ package app.private.patches
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
-import app.morphe.patcher.patch.ApkFileType
-import app.morphe.patcher.patch.AppTarget
-import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
-import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
-
-private val COMPATIBILITY_RETAKE_PRIVATE = Compatibility(
-    name = "BeReal",
-    packageName = "com.bereal.ft",
-    apkFileType = ApkFileType.XAPK,
-    targets = listOf(
-        AppTarget(version = "3.97.1"),
-    ),
-)
+import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 
 /**
  * BeReal's PostDraftEntity constructor — the local database entity that holds
  * the retake count before the post is finalized and uploaded.
  *
  * Verified against BeReal 3.97.1: Ldefpackage/pig; is the PostDraftEntity
- * (Room table with retakeCounter column, see lig.java:360 INSERT statement).
- * The constructor takes 47 parameters; the retakeCounter is the int parameter
- * at position 26 (after locationLatitude:Double and locationLongitude:Double),
- * which maps to p30 in smali registers.
- *
- * Fingerprint uses a custom check on parameter count to avoid hardcoding the
- * full 48-parameter signature.
+ * (Room table with retakeCounter column). The constructor takes 47 parameters.
  */
 object PostDraftEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/pig;",
     name = "<init>",
     returnType = "V",
     custom = { method, _ ->
-        // Match the 47-parameter PostDraftEntity constructor
         method.parameters.size == 47
     },
 )
@@ -45,24 +26,22 @@ object PostDraftEntityFingerprint : Fingerprint(
  *
  * Reads /sdcard/bereal_retakes.txt (single integer on one line, e.g. "0").
  * When the file exists, the patch substitutes its value for BeReal's retake
- * counter when constructing the PostDraftEntity. This affects the count stored
- * locally, sent to the API, and displayed to viewers.
+ * counter when constructing the PostDraftEntity.
  *
  * When the file is absent, BeReal's normal retake counting is untouched.
  *
  * PRIVATE PATCH — not for public distribution.
  */
+@Suppress("unused")
 val retakeOverridePatch = bytecodePatch(
     name = "Set retake count",
     description = "Reads /sdcard/bereal_retakes.txt and substitutes its integer value " +
         "for BeReal's retake counter. Only active when the file exists.",
 ) {
-    compatibleWith(COMPATIBILITY_RETAKE_PRIVATE)
+    compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
         PostDraftEntityFingerprint.method.apply {
-            // p30 = retakeCounter (int), the 26th constructor parameter
-            // (after p26/p27=locationLatitude:Double, p28/p29=locationLongitude:Double)
             addInstructions(
                 0,
                 """
@@ -84,7 +63,6 @@ val retakeOverridePatch = bytecodePatch(
                 move-result-object v0
                 invoke-static {v0}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
                 move-result v0
-                # Override p30 (retakeCounter) with the file value
                 move p30, v0
                 :no_override
                 nop
