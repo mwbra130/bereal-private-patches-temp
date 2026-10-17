@@ -14,25 +14,9 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
  * toString: "Location(longitude=..., latitude=...)".
  * The constructor is called when building post location data.
  */
-// Fingerprint the toString method which contains the unique Location string
-object LocationToStringFingerprint : Fingerprint(
-    name = "toString",
-    returnType = "Ljava/lang/String;",
-    strings = listOf("Location(longitude="),
-)
-
-// The constructor is in the same class as toString
 object LocationEntityFingerprint : Fingerprint(
+    definingClass = "Ldefpackage/txn;",
     name = "<init>",
-    custom = { method, classDef ->
-        // Match constructors in the same class as the Location toString
-        try {
-            val toStringClass = LocationToStringFingerprint.originalClassDef?.type
-            classDef.type == toStringClass && method.name == "<init>"
-        } catch (e: Exception) {
-            false
-        }
-    },
 )
 
 /**
