@@ -12,9 +12,11 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - name: Build patches
-        run: bash gradlew :patches:build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash gradlew :patches:build --no-daemon
       - name: Upload .mpp
         uses: actions/upload-artifact@v4
         with:
