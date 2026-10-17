@@ -15,10 +15,8 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
  * The constructor is called when building post location data.
  */
 object LocationEntityFingerprint : Fingerprint(
-    custom = { method, _ ->
-        method.definingClass == "Ldefpackage/txn;" &&
-        method.name == "<init>"
-    },
+    name = "<init>",
+    strings = listOf("Location(longitude="),
 )
 
 /**
