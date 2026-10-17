@@ -39,6 +39,7 @@ val locationOverridePatch = bytecodePatch(
     name = "Change location",
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
         "for BeReal's GPS location. Only active when the file exists.",
+    default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
