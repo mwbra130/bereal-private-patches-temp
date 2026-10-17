@@ -104,7 +104,7 @@ jobs:
               f.write("\n")
 
           bundle = {
-              "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+              "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
               "description": f"Private BeReal patches v{version}",
               "download_url": url,
               "signature_download_url": "",
