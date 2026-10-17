@@ -1,0 +1,17 @@
+package app.private.patches.shared
+
+import app.morphe.patcher.patch.ApkFileType
+import app.morphe.patcher.patch.AppTarget
+import app.morphe.patcher.patch.Compatibility
+
+object Constants {
+    val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
+        name = "BeReal",
+        packageName = "com.bereal.ft",
+        apkFileType = ApkFileType.XAPK,
+        appIconColor = 0x111111,
+        targets = listOf(
+            AppTarget(version = "3.97.1"),
+        ),
+    )
+}
