@@ -16,7 +16,7 @@ jobs:
       - name: Build patches
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash gradlew :patches:build --no-daemon
+        run: bash gradlew :patches:generatePatchesList --no-daemon
       - name: Upload .mpp
         uses: actions/upload-artifact@v4
         with:
