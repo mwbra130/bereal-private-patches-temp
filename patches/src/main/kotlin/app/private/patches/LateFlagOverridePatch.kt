@@ -38,6 +38,7 @@ val lateFlagOverridePatch = bytecodePatch(
     name = "Remove late flag",
     description = "Reads /sdcard/bereal_late.txt and substitutes its value " +
         "for BeReal's late flag. Only active when the file exists.",
+    default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
