@@ -37,11 +37,19 @@ jobs:
         run: |
           shopt -s nullglob
           files=(patches/build/libs/*.mpp)
-          if (( ${#files[@]} != 1 )); then
-            echo "Expected one .mpp; found ${#files[@]}"
+          selected=()
+          for file in "${files[@]}"; do
+            case "$(basename "$file")" in
+              *sources*|*javadoc*) continue ;;
+            esac
+            selected+=("$file")
+          done
+          if (( ${#selected[@]} != 1 )); then
+            echo "Expected one distributable .mpp (excluding sources/javadoc); found ${#selected[@]}"
+            printf '%s\n' "${selected[@]}"
             exit 1
           fi
-          echo "file=${files[0]}" >> "$GITHUB_OUTPUT"
+          echo "file=${selected[0]}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v4
         with:
