@@ -18,7 +18,13 @@ object LocationEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/teb;",
     name = "<init>",
     returnType = "V",
-    parameters = listOf("D", "D"),
+    custom = { method, _ ->
+        // Match the teb(double, double) constructor (longitude, latitude)
+        // There are 2 constructors: teb(int, double, double) [synthetic] and teb(double, double)
+        method.parameters.size == 2 &&
+        method.parameters[0] == "D" &&
+        method.parameters[1] == "D"
+    },
 )
 
 /**
