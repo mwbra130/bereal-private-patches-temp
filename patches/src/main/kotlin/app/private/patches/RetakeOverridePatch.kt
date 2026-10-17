@@ -1,4 +1,4 @@
-package app.private.patches
+package app.zdrgon.patches.berealcleanup.misc
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
@@ -56,9 +56,8 @@ val retakeOverridePatch = bytecodePatch(
     name = "Retake count override (private)",
     description = "Reads /sdcard/bereal_retakes.txt and substitutes its integer value " +
         "for BeReal's retake counter. Only active when the file exists.",
-    compatiblePackages = COMPATIBILITY_BEREAL_PRIVATE,
 ) {
-    compatibleWith("3.97.1")
+    compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
         PostDraftEntityFingerprint.method.apply {

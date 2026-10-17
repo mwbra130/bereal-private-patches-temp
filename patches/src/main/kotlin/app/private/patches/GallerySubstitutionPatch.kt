@@ -1,4 +1,4 @@
-package app.private.patches
+package app.zdrgon.patches.berealcleanup.misc
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
@@ -7,7 +7,7 @@ import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 
-private val COMPATIBILITY_GALLERY_PRIVATE = Compatibility(
+private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -20,14 +20,14 @@ private val COMPATIBILITY_GALLERY_PRIVATE = Compatibility(
  * BeReal's upload multipart builder — the single chokepoint where captured
  * images become upload parts.
  *
- * Verified against BeReal 3.97.1: Ldefpackage/ytd;->a(Ljava/io/File;Ldefpackage/xr8;)Lokhttp3/MultipartBody$Part;
+ * Verified against BeReal 3.97.1: Ldefpackage/ytd;->a(Ljava/io/File;Ldefpackage/xr8;)Lokhttp3/MultipartBody\$Part;
  * is the ONLY method app-wide that creates "binary-content" multipart parts.
  * Called once per image (primary/back and secondary/front captures).
  */
 object UploadMultipartFingerprint : Fingerprint(
     definingClass = "Ldefpackage/ytd;",
     name = "a",
-    returnType = "Lokhttp3/MultipartBody$Part;",
+    returnType = "Lokhttp3/MultipartBody\$Part;",
     parameters = listOf("Ljava/io/File;", "Ldefpackage/xr8;"),
     strings = listOf("binary-content"),
 )
@@ -48,9 +48,8 @@ val gallerySubstitutionPatch = bytecodePatch(
     description = "Replaces camera-captured images with gallery files from " +
         "/sdcard/bereal_gallery_primary.jpg and /sdcard/bereal_gallery_secondary.jpg. " +
         "Only active when the files exist.",
-    compatiblePackages = COMPATIBILITY_GALLERY_PRIVATE,
 ) {
-    compatibleWith("3.97.1")
+    compatibleWith(COMPATIBILITY_GALLERY_PRIVATE)
 
     execute {
         UploadMultipartFingerprint.method.apply {

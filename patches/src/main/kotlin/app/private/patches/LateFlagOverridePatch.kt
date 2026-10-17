@@ -52,9 +52,8 @@ val lateFlagOverridePatch = bytecodePatch(
     name = "Late flag override (private)",
     description = "Reads /sdcard/bereal_late.txt and substitutes its value " +
         "for BeReal's late flag. Only active when the file exists.",
-    compatiblePackages = COMPATIBILITY_LATE_PRIVATE,
 ) {
-    compatibleWith("3.97.1")
+    compatibleWith(COMPATIBILITY_LATE_PRIVATE)
 
     execute {
         LateFlagFingerprint.method.apply {

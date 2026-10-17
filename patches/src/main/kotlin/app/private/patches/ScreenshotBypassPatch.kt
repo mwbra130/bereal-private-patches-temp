@@ -1,4 +1,4 @@
-package app.private.patches
+package app.zdrgon.patches.berealcleanup.misc
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
@@ -9,7 +9,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
-private val COMPATIBILITY_SCREENSHOT_PRIVATE = Compatibility(
+private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -30,9 +30,9 @@ private val COMPATIBILITY_SCREENSHOT_PRIVATE = Compatibility(
  * endpoint string is confirmed.
  */
 object OkHttpRequestBuilderFingerprint : Fingerprint(
-    definingClass = "Lokhttp3/Request$Builder;",
+    definingClass = "Lokhttp3/Request\$Builder;",
     name = "url",
-    returnType = "Lokhttp3/Request$Builder;",
+    returnType = "Lokhttp3/Request\$Builder;",
     parameters = listOf("Ljava/lang/String;"),
 )
 
@@ -50,9 +50,8 @@ val screenshotBypassPatch = bytecodePatch(
     name = "Screenshot notification suppression (private)",
     description = "Blocks BeReal's screenshot reports from reaching the server. " +
         "Screenshots work normally locally, but the poster is not notified.",
-    compatiblePackages = COMPATIBILITY_SCREENSHOT_PRIVATE,
 ) {
-    compatibleWith("3.97.1")
+    compatibleWith(COMPATIBILITY_SCREENSHOT_PRIVATE)
 
     execute {
         OkHttpRequestBuilderFingerprint.method.apply {

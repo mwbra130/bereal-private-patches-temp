@@ -1,4 +1,4 @@
-package app.private.patches
+package app.zdrgon.patches.berealcleanup.misc
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
@@ -49,9 +49,8 @@ val locationOverridePatch = bytecodePatch(
     name = "Location override (private)",
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
         "for BeReal's GPS location. Only active when the file exists.",
-    compatiblePackages = COMPATIBILITY_BEREAL,
 ) {
-    compatibleWith("3.97.1")
+    compatibleWith(COMPATIBILITY_BEREAL)
 
     execute {
         LocationEntityFingerprint.method.apply {
