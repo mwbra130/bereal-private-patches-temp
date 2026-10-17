@@ -1,4 +1,4 @@
-package app.zdrgon.patches.berealcleanup.misc
+package app.private.patches
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
