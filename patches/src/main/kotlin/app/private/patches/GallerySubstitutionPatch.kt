@@ -7,7 +7,7 @@ import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 
-private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
+private val COMPATIBILITY_GALLERY_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -48,7 +48,7 @@ val gallerySubstitutionPatch = bytecodePatch(
     description = "Replaces camera-captured images with gallery files from " +
         "/sdcard/bereal_gallery_primary.jpg and /sdcard/bereal_gallery_secondary.jpg. " +
         "Only active when the files exist.",
-    compatiblePackages = COMPATIBILITY_BEREAL_PRIVATE,
+    compatiblePackages = COMPATIBILITY_GALLERY_PRIVATE,
 ) {
     compatibleWith("3.97.1")
 

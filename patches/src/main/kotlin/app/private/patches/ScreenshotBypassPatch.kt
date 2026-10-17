@@ -9,7 +9,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
-private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
+private val COMPATIBILITY_SCREENSHOT_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -50,7 +50,7 @@ val screenshotBypassPatch = bytecodePatch(
     name = "Screenshot notification suppression (private)",
     description = "Blocks BeReal's screenshot reports from reaching the server. " +
         "Screenshots work normally locally, but the poster is not notified.",
-    compatiblePackages = COMPATIBILITY_BEREAL_PRIVATE,
+    compatiblePackages = COMPATIBILITY_SCREENSHOT_PRIVATE,
 ) {
     compatibleWith("3.97.1")
 
