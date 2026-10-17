@@ -21,9 +21,8 @@ object LocationEntityFingerprint : Fingerprint(
     custom = { method, _ ->
         // Match the teb(double, double) constructor (longitude, latitude)
         // There are 2 constructors: teb(int, double, double) [synthetic] and teb(double, double)
-        method.parameters.size == 2 &&
-        method.parameters[0] == "D" &&
-        method.parameters[1] == "D"
+        val params = method.parameters.map { it.type }
+        params.size == 2 && params[0] == "D" && params[1] == "D"
     },
 )
 
