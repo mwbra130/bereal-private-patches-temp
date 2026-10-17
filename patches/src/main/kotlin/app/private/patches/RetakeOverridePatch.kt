@@ -37,6 +37,7 @@ val retakeOverridePatch = bytecodePatch(
     name = "Set retake count",
     description = "Reads /sdcard/bereal_retakes.txt and substitutes its integer value " +
         "for BeReal's retake counter. Only active when the file exists.",
+    default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
