@@ -7,7 +7,7 @@ import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 
-private val COMPATIBILITY_BEREAL = Compatibility(
+private val COMPATIBILITY_LOCATION_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -50,7 +50,7 @@ val locationOverridePatch = bytecodePatch(
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
         "for BeReal's GPS location. Only active when the file exists.",
 ) {
-    compatibleWith(COMPATIBILITY_BEREAL)
+    compatibleWith(COMPATIBILITY_LOCATION_PRIVATE)
 
     execute {
         LocationEntityFingerprint.method.apply {

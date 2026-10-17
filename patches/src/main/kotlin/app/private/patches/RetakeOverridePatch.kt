@@ -8,7 +8,7 @@ import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 
-private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
+private val COMPATIBILITY_RETAKE_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
@@ -57,7 +57,7 @@ val retakeOverridePatch = bytecodePatch(
     description = "Reads /sdcard/bereal_retakes.txt and substitutes its integer value " +
         "for BeReal's retake counter. Only active when the file exists.",
 ) {
-    compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
+    compatibleWith(COMPATIBILITY_RETAKE_PRIVATE)
 
     execute {
         PostDraftEntityFingerprint.method.apply {

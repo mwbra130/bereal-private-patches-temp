@@ -9,7 +9,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
-private val COMPATIBILITY_BEREAL_PRIVATE = Compatibility(
+private val COMPATIBILITY_SCREENSHOT_PRIVATE = Compatibility(
     name = "BeReal",
     packageName = "com.bereal.ft",
     apkFileType = ApkFileType.XAPK,
