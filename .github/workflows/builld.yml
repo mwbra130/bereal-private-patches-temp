@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-java@v4
         with:
@@ -27,13 +29,14 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           sed -i -E "s/^version[[:space:]]*=[[:space:]]*.*/version = $VERSION/" gradle.properties
 
-      - name: Build .mpp
+      - name: Build patch and generate Morphe metadata
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash gradlew :patches:generatePatchesList --no-daemon
 
-      - name: Find and upload .mpp
+      - name: Select distributable .mpp
         id: mpp
+        shell: bash
         run: |
           shopt -s nullglob
           files=(patches/build/libs/*.mpp)
@@ -45,27 +48,79 @@ jobs:
             selected+=("$file")
           done
           if (( ${#selected[@]} != 1 )); then
-            echo "Expected one distributable .mpp (excluding sources/javadoc); found ${#selected[@]}"
+            echo "Expected one distributable .mpp; found ${#selected[@]}"
             printf '%s\n' "${selected[@]}"
             exit 1
           fi
           echo "file=${selected[0]}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           name: morphe-patch-${{ github.ref_name }}
           path: ${{ steps.mpp.outputs.file }}
           if-no-files-found: error
 
-      - name: Publish .mpp to GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish .mpp release asset
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
-          TAG="$GITHUB_REF_NAME"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="$(sed -nE 's/^version[[:space:]]*=[[:space:]]*([^[:space:]]+).*/\1/p' gradle.properties | head -n1)"
+          fi
+          TAG="v$VERSION"
           FILE="${{ steps.mpp.outputs.file }}"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$FILE" --clobber
           else
             gh release create "$TAG" "$FILE" --title "$TAG" --notes "Automated Morphe patch build."
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Update Morphe source metadata
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          version = os.environ["VERSION"]
+          url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/download/v{version}/patches-{version}.mpp"
+
+          list_path = "patches-list.json"
+          if not os.path.isfile(list_path):
+              raise SystemExit(f"Missing generated {list_path}; refusing to publish incomplete Morphe source metadata")
+          with open(list_path, encoding="utf-8") as f:
+              patch_list = json.load(f)
+          patch_list["version"] = version
+          with open(list_path, "w", encoding="utf-8") as f:
+              json.dump(patch_list, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+
+          bundle = {
+              "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+              "description": f"Private BeReal patches v{version}",
+              "download_url": url,
+              "signature_download_url": "",
+              "version": version
+          }
+          with open("patches-bundle.json", "w", encoding="utf-8") as f:
+              json.dump(bundle, f, indent=2)
+              f.write("\n")
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add patches-list.json patches-bundle.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update Morphe source metadata [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "Morphe metadata is already current."
           fi
