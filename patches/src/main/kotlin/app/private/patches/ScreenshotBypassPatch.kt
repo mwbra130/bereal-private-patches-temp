@@ -47,7 +47,7 @@ object OkHttpRequestBuilderFingerprint : Fingerprint(
  * PRIVATE PATCH — not for public distribution.
  */
 val screenshotBypassPatch = bytecodePatch(
-    name = "Screenshot notification suppression (private)",
+    name = "Hide screenshot notification",
     description = "Blocks BeReal's screenshot reports from reaching the server. " +
         "Screenshots work normally locally, but the poster is not notified.",
 ) {

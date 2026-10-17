@@ -49,7 +49,7 @@ object LateFlagFingerprint : Fingerprint(
  * PRIVATE PATCH — not for public distribution.
  */
 val lateFlagOverridePatch = bytecodePatch(
-    name = "Late flag override (private)",
+    name = "Remove late flag",
     description = "Reads /sdcard/bereal_late.txt and substitutes its value " +
         "for BeReal's late flag. Only active when the file exists.",
 ) {

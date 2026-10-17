@@ -44,7 +44,7 @@ object UploadMultipartFingerprint : Fingerprint(
  * PRIVATE PATCH — not for public distribution.
  */
 val gallerySubstitutionPatch = bytecodePatch(
-    name = "Gallery substitution (private)",
+    name = "Use gallery photo",
     description = "Replaces camera-captured images with gallery files from " +
         "/sdcard/bereal_gallery_primary.jpg and /sdcard/bereal_gallery_secondary.jpg. " +
         "Only active when the files exist.",

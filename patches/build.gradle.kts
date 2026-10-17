@@ -2,13 +2,13 @@ group = "app.zdrgon"
 
 patches {
     about {
-        name = "Zdrgon's Morphe Patches"
-        description = "Patches for Direct-to-Cell (DTC) satellite optimization and custom app modifications"
-        source = "git@github.com:Zdrgon/morphe-patches.git"
-        author = "Zdrgon"
+        name = "BeReal Private Patches"
+        description = "Private BeReal patches - not for distribution"
+        source = "private"
+        author = "private"
         contact = "na"
-        website = "https://github.com/Zdrgon/morphe-patches"
-        license = "GPLv3"
+        website = "na"
+        license = "Private"
     }
 }
 

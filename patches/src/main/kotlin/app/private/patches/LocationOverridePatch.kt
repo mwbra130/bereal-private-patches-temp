@@ -46,7 +46,7 @@ object LocationEntityFingerprint : Fingerprint(
  * PRIVATE PATCH — not for public distribution.
  */
 val locationOverridePatch = bytecodePatch(
-    name = "Location override (private)",
+    name = "Change location",
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
         "for BeReal's GPS location. Only active when the file exists.",
 ) {
