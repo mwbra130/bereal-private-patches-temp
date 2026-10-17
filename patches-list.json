@@ -1,11 +1,11 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.8.8",
+  "version": "1.8.9",
   "patches": [
     {
       "name": "Change location",
       "description": "Reads /sdcard/bereal_location.txt and substitutes its coordinates for BeReal's GPS location. Only active when the file exists.",
-      "default": true,
+      "default": false,
       "dependencies": [],
       "compatiblePackages": [
         {
@@ -31,7 +31,7 @@
     {
       "name": "Hide screenshot notification",
       "description": "Blocks BeReal's screenshot reports from reaching the server. Screenshots work normally locally, but the poster is not notified.",
-      "default": true,
+      "default": false,
       "dependencies": [],
       "compatiblePackages": [
         {
@@ -57,7 +57,7 @@
     {
       "name": "Remove late flag",
       "description": "Reads /sdcard/bereal_late.txt and substitutes its value for BeReal's late flag. Only active when the file exists.",
-      "default": true,
+      "default": false,
       "dependencies": [],
       "compatiblePackages": [
         {
@@ -83,7 +83,7 @@
     {
       "name": "Set retake count",
       "description": "Reads /sdcard/bereal_retakes.txt and substitutes its integer value for BeReal's retake counter. Only active when the file exists.",
-      "default": true,
+      "default": false,
       "dependencies": [],
       "compatiblePackages": [
         {
@@ -109,7 +109,7 @@
     {
       "name": "Use gallery photo",
       "description": "Replaces camera-captured images with gallery files from /sdcard/bereal_gallery_primary.jpg and /sdcard/bereal_gallery_secondary.jpg. Only active when the files exist.",
-      "default": true,
+      "default": false,
       "dependencies": [],
       "compatiblePackages": [
         {
