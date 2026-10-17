@@ -2,19 +2,8 @@ package app.private.patches
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
-import app.morphe.patcher.patch.ApkFileType
-import app.morphe.patcher.patch.AppTarget
-import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
-
-private val COMPATIBILITY_LATE_PRIVATE = Compatibility(
-    name = "BeReal",
-    packageName = "com.bereal.ft",
-    apkFileType = ApkFileType.XAPK,
-    targets = listOf(
-        AppTarget(version = "3.97.1"),
-    ),
-)
+import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 
 /**
  * BeReal's PostDraftEntity constructor — the single persistence point for the
@@ -22,10 +11,7 @@ private val COMPATIBILITY_LATE_PRIVATE = Compatibility(
  *
  * Verified against BeReal 3.97.1: Ldefpackage/pig; is the PostDraftEntity
  * Room entity with a 47-parameter constructor. The `isLate` boolean is the
- * 31st parameter (field E), at smali register p37.
- *
- * Data flow: PostDraftEntity(isLate) -> Room DB -> API JSON "isLate" ->
- * displayed to viewers as the late indicator.
+ * 31st parameter at smali register p37.
  */
 object LateFlagFingerprint : Fingerprint(
     definingClass = "Ldefpackage/pig;",
@@ -41,25 +27,22 @@ object LateFlagFingerprint : Fingerprint(
  *
  * Reads /sdcard/bereal_late.txt (single line: "true" or "false").
  * When the file exists, the patch substitutes its value for BeReal's
- * calculated isLate flag when constructing the post draft. This affects
- * the value stored locally, sent to the API, and displayed to viewers.
+ * calculated isLate flag when constructing the post draft.
  *
  * When the file is absent, BeReal's normal late calculation is untouched.
  *
  * PRIVATE PATCH — not for public distribution.
  */
+@Suppress("unused")
 val lateFlagOverridePatch = bytecodePatch(
     name = "Remove late flag",
     description = "Reads /sdcard/bereal_late.txt and substitutes its value " +
         "for BeReal's late flag. Only active when the file exists.",
 ) {
-    compatibleWith(COMPATIBILITY_LATE_PRIVATE)
+    compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
         LateFlagFingerprint.method.apply {
-            // p37 = isLate boolean (31st constructor parameter).
-            // Read /sdcard/bereal_late.txt; if it contains "true"/"false",
-            // overwrite p37 before the original constructor body runs.
             addInstructions(
                 0,
                 """
