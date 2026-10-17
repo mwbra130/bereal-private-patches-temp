@@ -37,6 +37,7 @@ val screenshotBypassPatch = bytecodePatch(
     name = "Hide screenshot notification",
     description = "Blocks BeReal's screenshot reports from reaching the server. " +
         "Screenshots work normally locally, but the poster is not notified.",
+    default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
