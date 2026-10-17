@@ -15,15 +15,10 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
  * The constructor is called when building post location data.
  */
 object LocationEntityFingerprint : Fingerprint(
-    definingClass = "Ldefpackage/teb;",
+    definingClass = "Ldefpackage/txn;",
     name = "<init>",
     returnType = "V",
-    custom = { method, _ ->
-        // Match the teb(double, double) constructor (longitude, latitude)
-        // There are 2 constructors: teb(int, double, double) [synthetic] and teb(double, double)
-        val params = method.parameters.map { it.type }
-        params.size == 2 && params[0] == "D" && params[1] == "D"
-    },
+    parameters = listOf("D", "D"),
 )
 
 /**
