@@ -37,9 +37,26 @@ val lateFlagOverridePatch = bytecodePatch(
     execute {
         // Find esc via toString, then get the 17-param constructor
         val classDef = EscToStringFingerprint.classDef
-        val method = classDef.methods.singleOrNull {
-            it.name == "<init>" && it.parameterTypes.size == 17
-        } ?: throw Exception("Remove late flag: esc 17-param constructor not found")
+
+        val constructors = classDef.methods
+            .filter { it.name == "<init>" }
+
+        println("Matched class: ${classDef.type}")
+        println("Constructors found: ${constructors.size}")
+
+        constructors.forEach { constructor ->
+            println(
+                "Constructor: ${constructor.parameterTypes.size} parameters; " +
+                constructor.parameterTypes.joinToString()
+            )
+        }
+
+        val method = constructors.singleOrNull {
+            it.parameterTypes.size == 17
+        } ?: throw Exception(
+            "Expected exactly one 17-parameter constructor; " +
+            "found ${constructors.count { it.parameterTypes.size == 17 }}"
+        )
 
         method.apply {
             addInstructions(
