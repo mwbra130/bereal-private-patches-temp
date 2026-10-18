@@ -51,12 +51,20 @@ val lateFlagOverridePatch = bytecodePatch(
             )
         }
 
-        val matching = constructors.filter { it.parameterTypes.size == 17 }
-        val method = when (matching.size) {
-            1 -> matching[0]
-            0 -> throw Exception("No 17-param constructor found in ${classDef.type} (found ${constructors.size} constructors)")
-            else -> throw Exception("Multiple 17-param constructors found in ${classDef.type}: ${matching.size}")
-        }
+        val details = constructors
+            .filter { it.parameterTypes.size == 17 }
+            .mapIndexed { index, constructor ->
+                "Constructor #${index + 1}:\n" +
+                    constructor.parameterTypes.mapIndexed { i, type ->
+                        "  [$i] $type"
+                    }.joinToString("\n")
+            }
+            .joinToString("\n---\n")
+
+        throw Exception(
+            "DEBUG: ${classDef.type}\n" +
+                "17-parameter constructors:\n$details"
+        )
 
         method.apply {
             addInstructions(
