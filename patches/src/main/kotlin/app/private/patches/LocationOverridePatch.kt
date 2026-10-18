@@ -1,8 +1,18 @@
 package app.private.patches
 
+import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
+
+/**
+ * Finds teb via its toString() which contains "Location(longitude=".
+ * Then gets the (D,D) constructor from that class.
+ */
+object TebToStringFingerprint : Fingerprint(
+    returnType = "Ljava/lang/String;",
+    strings = listOf("Location(longitude="),
+)
 
 /**
  * Private location override patch.
@@ -25,10 +35,8 @@ val locationOverridePatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
-        // Find teb class directly by type, bypassing Fingerprint
-        // teb has two constructors: teb(D,D) and synthetic teb(I,D,D)
-        // We want the (D,D) one
-        val classDef = mutableClassDefBy("Ldefpackage/teb;")
+        // Find teb via toString, then get the (D,D) constructor
+        val classDef = TebToStringFingerprint.classDef
         val method = classDef.methods.singleOrNull {
             it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("D", "D")
         } ?: throw Exception("Change location: teb(D,D) constructor not found")
