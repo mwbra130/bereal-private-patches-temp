@@ -12,6 +12,7 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
  * Verified against BeReal 3.97.1: Ldefpackage/esc; is the PostDraftEntity
  * (Room table with retakeCounter column). The constructor takes 17 parameters (verified from user APK).
  */
+// Verified against user APK 3.97.1 (3arch_1dpi): esc is PostDraft
 object PostDraftEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/esc;",
     name = "<init>",
