@@ -17,6 +17,8 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 object LocationEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/txn;",
     name = "<init>",
+    returnType = "V",
+    parameters = listOf("D", "D"),
 )
 
 /**
