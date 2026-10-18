@@ -51,12 +51,12 @@ val lateFlagOverridePatch = bytecodePatch(
             )
         }
 
-        val method = constructors.singleOrNull {
-            it.parameterTypes.size == 17
-        } ?: throw Exception(
-            "Expected exactly one 17-parameter constructor; " +
-            "found ${constructors.count { it.parameterTypes.size == 17 }}"
-        )
+        val matching = constructors.filter { it.parameterTypes.size == 17 }
+        val method = when (matching.size) {
+            1 -> matching[0]
+            0 -> throw Exception("No 17-param constructor found in ${classDef.type} (found ${constructors.size} constructors)")
+            else -> throw Exception("Multiple 17-param constructors found in ${classDef.type}: ${matching.size}")
+        }
 
         method.apply {
             addInstructions(
