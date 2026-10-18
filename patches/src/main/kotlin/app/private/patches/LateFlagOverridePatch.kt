@@ -1,8 +1,18 @@
 package app.private.patches
 
+import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
+
+/**
+ * Finds esc via its toString() which contains "MomentPost(".
+ * Then gets the 17-param constructor from that class.
+ */
+object EscToStringFingerprint : Fingerprint(
+    returnType = "Ljava/lang/String;",
+    strings = listOf("MomentPost("),
+)
 
 /**
  * Private late-flag override patch.
@@ -25,10 +35,8 @@ val lateFlagOverridePatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
-        // Find esc class directly by type, bypassing Fingerprint
-        // esc has two constructors: 17-param and synthetic 18-param
-        // We want the 17-param one
-        val classDef = mutableClassDefBy("Ldefpackage/esc;")
+        // Find esc via toString, then get the 17-param constructor
+        val classDef = EscToStringFingerprint.classDef
         val method = classDef.methods.singleOrNull {
             it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("Ljava/lang/String;", "Ljava/lang/String;", "J", "J", "Ldefpackage/t2j;", "I", "Ljava/util/List;", "Ljava/lang/String;", "Ljava/lang/String;", "J", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/teb;", "I", "Z")
         } ?: throw Exception("Remove late flag: esc 17-param constructor not found")
