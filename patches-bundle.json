@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-18T04:05:00",
-  "description": "Private BeReal patches v1.8.25",
-  "download_url": "https://github.com/mwbra130/bereal-private-patches-temp/releases/download/v1.8.25/patches-1.8.25.mpp",
+  "created_at": "2026-10-18T04:20:00",
+  "description": "Private BeReal patches v1.8.26 (4 working: Gallery, Screenshot, Retake, Late)",
+  "download_url": "https://github.com/mwbra130/bereal-private-patches-temp/releases/download/v1.8.26/patches-1.8.26.mpp",
   "signature_download_url": "",
-  "version": "1.8.25"
+  "version": "1.8.26"
 }
