@@ -17,9 +17,6 @@ object LateFlagFingerprint : Fingerprint(
     definingClass = "Ldefpackage/esc;",
     name = "<init>",
     returnType = "V",
-    custom = { method, _ ->
-        method.parameters.size == 47
-    },
 )
 
 /**
