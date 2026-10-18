@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-18T04:50:00",
-  "description": "Private BeReal patches v1.8.29",
-  "download_url": "https://github.com/mwbra130/bereal-private-patches-temp/releases/download/v1.8.29/patches-1.8.29.mpp",
+  "created_at": "2026-10-18T20:20:00",
+  "description": "Private BeReal patches v1.8.30 (all 5, fixed fingerprints)",
+  "download_url": "https://github.com/mwbra130/bereal-private-patches-temp/releases/download/v1.8.30/patches-1.8.30.mpp",
   "signature_download_url": "",
-  "version": "1.8.29"
+  "version": "1.8.30"
 }
