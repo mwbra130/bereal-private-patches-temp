@@ -1,42 +1,8 @@
 package app.private.patches
 
-import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
-
-/**
- * BeReal's PostDraftEntity constructor — the single persistence point for the
- * late flag before API submission.
- *
- * Verified against BeReal 3.97.1: Ldefpackage/esc; is the PostDraftEntity
- * Room entity with a 47-parameter constructor. The `isLate` boolean is the
- * 31st parameter at smali register p20.
- */
-object LateFlagFingerprint : Fingerprint(
-    definingClass = "Ldefpackage/esc;",
-    name = "<init>",
-    returnType = "V",
-    parameters = listOf(
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        "J",
-        "J",
-        "Ldefpackage/t2j;",
-        "I",
-        "Ljava/util/List;",
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        "J",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/teb;",
-        "I",
-        "Z",
-    ),
-)
 
 /**
  * Private late-flag override patch.
@@ -59,7 +25,15 @@ val lateFlagOverridePatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
-        LateFlagFingerprint.method.apply {
+        // Find esc class directly by type, bypassing Fingerprint
+        // esc has two constructors: 17-param and synthetic 18-param
+        // We want the 17-param one
+        val classDef = mutableClassDefBy("Ldefpackage/esc;")
+        val method = classDef.methods.singleOrNull {
+            it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("Ljava/lang/String;", "Ljava/lang/String;", "J", "J", "Ldefpackage/t2j;", "I", "Ljava/util/List;", "Ljava/lang/String;", "Ljava/lang/String;", "J", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/teb;", "I", "Z")
+        } ?: throw Exception("Remove late flag: esc 17-param constructor not found")
+
+        method.apply {
             addInstructions(
                 0,
                 """
