@@ -1,36 +1,17 @@
 package app.private.patches
 
-import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 
 /**
- * BeReal's Location entity constructor.
- *
- * Verified against BeReal 3.97.1: Ldefpackage/teb; is
- * bereal.app.entities.Location with constructor
- *   teb(DD)V  (longitude first, latitude second)
- * toString: "Location(longitude=..., latitude=...)".
- * The constructor is called when building post location data.
- */
-object LocationEntityFingerprint : Fingerprint(
-    definingClass = "Ldefpackage/teb;",
-    name = "<init>",
-    returnType = "V",
-    parameters = listOf("D", "D"),
-)
-
-/**
  * Private location override patch.
  *
- * Reads /sdcard/bereal_location.txt (format: "latitude,longitude" on one line,
- * e.g. "33.8542,-112.1197"). When the file exists, the patch substitutes the
- * file's coordinates for the GPS location when BeReal constructs its Location
- * entity. When the file is absent, BeReal's normal GPS behavior is untouched.
+ * Reads /sdcard/bereal_location.txt (single line: "latitude,longitude").
+ * When the file exists, the patch substitutes its coordinates for BeReal's
+ * location when constructing the post.
  *
- * Use OpenStreetMap Nominatim (https://nominatim.openstreetmap.org) to resolve
- * a place name to coordinates, then write them to the file.
+ * When the file is absent, BeReal's normal location is untouched.
  *
  * PRIVATE PATCH — not for public distribution.
  */
@@ -38,13 +19,21 @@ object LocationEntityFingerprint : Fingerprint(
 val locationOverridePatch = bytecodePatch(
     name = "Change location",
     description = "Reads /sdcard/bereal_location.txt and substitutes its coordinates " +
-        "for BeReal's GPS location. Only active when the file exists.",
+        "for BeReal's location. Only active when the file exists.",
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
-        LocationEntityFingerprint.method.apply {
+        // Find teb class directly by type, bypassing Fingerprint
+        // teb has two constructors: teb(D,D) and synthetic teb(I,D,D)
+        // We want the (D,D) one
+        val classDef = mutableClassDefBy("Ldefpackage/teb;")
+        val method = classDef.methods.singleOrNull {
+            it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("D", "D")
+        } ?: throw Exception("Change location: teb(D,D) constructor not found")
+
+        method.apply {
             addInstructions(
                 0,
                 """
@@ -62,22 +51,22 @@ val locationOverridePatch = bytecodePatch(
                 invoke-virtual {v0}, Ljava/io/BufferedReader;->readLine()Ljava/lang/String;
                 move-result-object v0
                 if-eqz v0, :no_override
+                invoke-virtual {v0}, Ljava/lang/String;->trim()Ljava/lang/String;
+                move-result-object v0
                 const-string v1, ","
                 invoke-virtual {v0, v1}, Ljava/lang/String;->split(Ljava/lang/String;)[Ljava/lang/String;
                 move-result-object v0
                 array-length v1, v0
                 const/4 v2, 0x2
-                if-lt v1, v2, :no_override
+                if-ne v1, v2, :no_override
                 const/4 v1, 0x0
                 aget-object v1, v0, v1
                 invoke-static {v1}, Ljava/lang/Double;->parseDouble(Ljava/lang/String;)D
-                move-result-wide v1
-                const/4 v3, 0x1
-                aget-object v0, v0, v3
+                move-result-wide p1
+                const/4 v1, 0x1
+                aget-object v0, v0, v1
                 invoke-static {v0}, Ljava/lang/Double;->parseDouble(Ljava/lang/String;)D
-                move-result-wide v3
-                move-wide p1, v3
-                move-wide p3, v1
+                move-result-wide p3
                 :no_override
                 nop
                 """.trimIndent(),
