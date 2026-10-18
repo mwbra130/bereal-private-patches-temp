@@ -15,10 +15,6 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 object PostDraftEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/pig;",
     name = "<init>",
-    returnType = "V",
-    custom = { method, _ ->
-        method.parameters.size == 47
-    },
 )
 
 /**
