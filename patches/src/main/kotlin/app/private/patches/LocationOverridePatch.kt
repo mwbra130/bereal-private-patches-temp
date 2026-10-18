@@ -38,8 +38,8 @@ val locationOverridePatch = bytecodePatch(
         // Find teb via toString, then get the (D,D) constructor
         val classDef = TebToStringFingerprint.classDef
         val method = classDef.methods.singleOrNull {
-            it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("D", "D")
-        } ?: throw Exception("Change location: teb(D,D) constructor not found")
+            it.name == "<init>" && it.parameterTypes.size == 2
+        } ?: throw Exception("Change location: teb 2-param constructor not found")
 
         method.apply {
             addInstructions(
