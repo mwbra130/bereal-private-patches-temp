@@ -1,65 +1,39 @@
 package app.private.patches
 
-import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 
 /**
- * BeReal's PostDraftEntity constructor — the local database entity that holds
- * the retake count before the post is finalized and uploaded.
+ * Private retake-count override patch.
  *
- * Verified against BeReal 3.97.1: Ldefpackage/esc; is the PostDraftEntity
- * (Room table with retakeCounter column). The constructor takes 17 parameters (verified from user APK).
- */
-// Verified against user APK 3.97.1 (3arch_1dpi): esc is PostDraft
-object PostDraftEntityFingerprint : Fingerprint(
-    definingClass = "Ldefpackage/esc;",
-    name = "<init>",
-    returnType = "V",
-    parameters = listOf(
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        "J",
-        "J",
-        "Ldefpackage/t2j;",
-        "I",
-        "Ljava/util/List;",
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        "J",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/s2j;",
-        "Ldefpackage/teb;",
-        "I",
-        "Z",
-    ),
-)
-
-/**
- * Private retake count override patch.
+ * Reads /sdcard/bereal_retakes.txt (single line: a number).
+ * When the file exists, the patch substitutes its value for BeReal's
+ * calculated retake count when constructing the post draft.
  *
- * Reads /sdcard/bereal_retakes.txt (single integer on one line, e.g. "0").
- * When the file exists, the patch substitutes its value for BeReal's retake
- * counter when constructing the PostDraftEntity.
- *
- * When the file is absent, BeReal's normal retake counting is untouched.
+ * When the file is absent, BeReal's normal retake calculation is untouched.
  *
  * PRIVATE PATCH — not for public distribution.
  */
 @Suppress("unused")
 val retakeOverridePatch = bytecodePatch(
     name = "Set retake count",
-    description = "Reads /sdcard/bereal_retakes.txt and substitutes its integer value " +
-        "for BeReal's retake counter. Only active when the file exists.",
+    description = "Reads /sdcard/bereal_retakes.txt and substitutes its value " +
+        "for BeReal's retake count. Only active when the file exists.",
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_BEREAL_PRIVATE)
 
     execute {
-        PostDraftEntityFingerprint.method.apply {
+        // Find esc class directly by type, bypassing Fingerprint
+        // esc has two constructors: 17-param and synthetic 18-param
+        // We want the 17-param one
+        val classDef = mutableClassDefBy("Ldefpackage/esc;")
+        val method = classDef.methods.singleOrNull {
+            it.name == "<init>" && it.parameterTypes.map { p -> p.toString() } == listOf("Ljava/lang/String;", "Ljava/lang/String;", "J", "J", "Ldefpackage/t2j;", "I", "Ljava/util/List;", "Ljava/lang/String;", "Ljava/lang/String;", "J", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/s2j;", "Ldefpackage/teb;", "I", "Z")
+        } ?: throw Exception("Set retake count: esc 17-param constructor not found")
+
+        method.apply {
             addInstructions(
                 0,
                 """
