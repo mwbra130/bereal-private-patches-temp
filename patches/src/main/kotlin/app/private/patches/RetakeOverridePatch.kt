@@ -16,6 +16,26 @@ import app.private.patches.shared.Constants.COMPATIBILITY_BEREAL_PRIVATE
 object PostDraftEntityFingerprint : Fingerprint(
     definingClass = "Ldefpackage/esc;",
     name = "<init>",
+    returnType = "V",
+    parameters = listOf(
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        "J",
+        "J",
+        "Ldefpackage/t2j;",
+        "I",
+        "Ljava/util/List;",
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        "J",
+        "Ldefpackage/s2j;",
+        "Ldefpackage/s2j;",
+        "Ldefpackage/s2j;",
+        "Ldefpackage/s2j;",
+        "Ldefpackage/teb;",
+        "I",
+        "Z",
+    ),
 )
 
 /**
